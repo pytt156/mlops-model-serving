@@ -8,6 +8,7 @@ COPY pyproject.toml uv.lock ./
 RUN uv sync --no-dev --no-install-project
 
 COPY app/ ./app/
+COPY artifacts/ ./artifacts/
 
 ENV PATH="/app/.venv/bin:$PATH"
 EXPOSE 8000
