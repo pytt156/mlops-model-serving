@@ -8,4 +8,7 @@ dependencies = [
     "fastapi>=0.115",
     "uvicorn[standard]>=0.32",
     "python-multipart>=0.0.9",
+    "torch>=2.10.0",
+    "torchvision>=0.25.0",
+    "pillow>=12.1.1",
 ]
