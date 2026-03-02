@@ -9,7 +9,6 @@ Contract:
 """
 
 from app.config import CIFAR10_CLASSES
-from app.make_model import make_model
 
 import torch
 import os
@@ -17,13 +16,12 @@ import os
 from torchvision import transforms
 from PIL import Image
 from io import BytesIO
-
-MODEL_WEIGHTS_PATH = "artifacts/best_model.pt"
+from typing import Callable, Any
 
 _CIFAR10_MEAN = (0.4914, 0.4822, 0.4465)
 _CIFAR10_STD = (0.2470, 0.2435, 0.2616)
 
-_preprocess = transforms.Compose(
+_preprocess: Callable[[Image.Image], torch.Tensor] = transforms.Compose(
     [
         transforms.Resize((32, 32)),
         transforms.ToTensor(),
@@ -31,19 +29,21 @@ _preprocess = transforms.Compose(
     ]
 )
 
-_model = None
+MODEL_TORCHSCRIPT_PATH = "artifacts/model.torchscript.pt"
+
+_model: Any | None = None
 
 
-def _get_model():
+def _get_model() -> Any:
     global _model
 
-    if not os.path.exists(MODEL_WEIGHTS_PATH):
-        raise FileNotFoundError(f"Model weights not found: {MODEL_WEIGHTS_PATH}")
+    if not os.path.exists(MODEL_TORCHSCRIPT_PATH):
+        raise FileNotFoundError(
+            f"TorchScript model not found: {MODEL_TORCHSCRIPT_PATH}"
+        )
 
     if _model is None:
-        model = make_model(num_classes=len(CIFAR10_CLASSES))
-        state = torch.load(MODEL_WEIGHTS_PATH, map_location="cpu")
-        model.load_state_dict(state)
+        model = torch.jit.load(MODEL_TORCHSCRIPT_PATH, map_location="cpu")
         model.eval()
         _model = model
 

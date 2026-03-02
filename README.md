@@ -42,31 +42,38 @@ Both run in separate Docker containers connected through an internal network.
 ```
 
 ## Project Structure
+
 ```
 .
 ├── app/
-│   ├── config.py          # Model configuration
-│   ├── main.py            # FastAPI entrypoint
-│   ├── make_model.py      # Model architecture definition
-│   └── model.py           # Model loading & inference logic
+│   ├── config.py              # Class labels and configuration
+│   ├── main.py                # FastAPI entrypoint
+│   ├── make_model.py          # Model architecture (used for TorchScript export)
+│   └── model.py               # TorchScript loading & inference logic
 ├── artifacts/
-│   └── best_model.pt      # Trained weights
-├── streamlit_app.py       # UI service
+│   ├── best_model.pt          # Original trained weights
+│   └── model.torchscript.pt   # Exported TorchScript model
+├── scripts/
+│   └── export_torchscript.py  # TorchScript export script
+├── assets/                    # README screenshots
+├── streamlit_app.py           # Streamlit frontend
 ├── Dockerfile
 ├── docker-compose.yml
 ├── pyproject.toml
-└── uv.lock
+├── uv.lock
+└── README.md
 ```
 
 ## Model Details
-- Architecture defined in `app/make_model.py`
-- Weights stored in `artifacts/best_model.pt`
-- Lazy-loaded via `_get_model()`
+- Architecture defined in `app/make_model.py` (used for TorchScript export)
+- Model exported to TorchScript: `artifacts/model.torchscript.pt`
+- Inference loads the scripted model via `_get_model()` using `torch.jit.load`
 - Preprocessing:
-    - `Resize(32, 32)`
-    - `ToTensor()`
-    - `Normalize(mean=(0.4914, 0.4822, 0.4465), std=(0.2470, 0.2435, 0.2616))`
+  - `Resize(32, 32)`
+  - `ToTensor()`
+  - `Normalize(mean=(0.4914, 0.4822, 0.4465), std=(0.2470, 0.2435, 0.2616))`
 - Softmax used to compute confidence
+- Original training weights (`best_model.pt`) are used only for generating the TorchScript export
 
 ## API Endpoints
 
@@ -165,4 +172,4 @@ Key pull requests:
   The model reused from a previous assignment is not heavily optimized. Further improvements could include performance tuning, architectural experimentation, better configuration handling (e.g., environment variables), structured logging, CI for container builds, and more robust input validation.
 
 - **Use of LLMs**  
-  LLM were used as a development assistant for reviewing structure, clarifying architectural decisions, debugging environment issues, and refining documentation. All implementation and verification were performed manually.
+  LLMs were used as a development assistant for reviewing structure, clarifying architectural decisions, debugging environment issues, and refining documentation. All implementation and verification were performed manually.
