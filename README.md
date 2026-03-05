@@ -173,3 +173,7 @@ Key pull requests:
 
 - **Use of LLMs**  
   LLMs were used as a development assistant for reviewing structure, clarifying architectural decisions, debugging environment issues, and refining documentation. All implementation and verification were performed manually.
+
+  ## Collaborators:
+   - Ömer Aytug
+   - Daniela Algerydh
